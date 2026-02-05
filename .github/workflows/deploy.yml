@@ -45,4 +45,4 @@ jobs:
             cd traefik-test
             git pull origin main
             docker-compose pull
-            docker-compose up -d
+            docker-compose up -d --scale auth-service=3 --scale user-service=2
