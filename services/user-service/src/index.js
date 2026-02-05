@@ -14,7 +14,7 @@ async function getUser(userId) {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-    res.json({ status: 'ok', service: 'auth-service' });
+    res.json({ status: 'ok', service: 'user-service' });
 });
 
 app.get("/me", async (req, res) => {
