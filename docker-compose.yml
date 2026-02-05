@@ -16,7 +16,7 @@ services:
     image: postgres:15
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=postgres
     ports:
       - "5432:5432"
@@ -33,7 +33,7 @@ services:
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=postgres
     depends_on:
       postgres:
@@ -46,7 +46,7 @@ services:
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=postgres
       - JWT_SECRET=your-secret-key-123
       - PORT=4000
@@ -63,7 +63,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth-service.rule=Host(`auth-service.${{ secrets.EC2_HOST }}.traefik.me`)"
+      - "traefik.http.routers.auth-service.rule=Host(`auth-service.${EC2_HOST}.traefik.me`)"
       - "traefik.http.services.auth-service.loadbalancer.server.port=4000"
   user-service:
     restart: "unless-stopped"
@@ -72,7 +72,7 @@ services:
       - DB_HOST=postgres
       - DB_PORT=5432
       - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
       - DB_NAME=postgres
       - AUTH_SERVICE_URL=http://auth-service:4000
       - PORT=4001
@@ -89,7 +89,7 @@ services:
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.user-service.rule=Host(`user-service.${{ secrets.EC2_HOST }}.traefik.me`)"
+      - "traefik.http.routers.user-service.rule=Host(`user-service.${EC2_HOST}.traefik.me`)"
       - "traefik.http.services.user-service.loadbalancer.server.port=4001"
 volumes:
   postgres_data:
