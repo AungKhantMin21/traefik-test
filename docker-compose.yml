@@ -41,7 +41,7 @@ services:
     restart: "no"
   auth-service:
     restart: "unless-stopped"
-    build: ./services/auth-service
+    image: ${DOCKER_USERNAME}/auth-service:latest
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -56,18 +56,18 @@ services:
       auth-migration:
         condition: service_completed_successfully
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4000/health || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://auth-service:4000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.auth-service.rule=Host(`auth-service.localhost`)"
+      - "traefik.http.routers.auth-service.rule=Host(`auth-service.${{ secrets.EC2_HOST }}.traefik.me`)"
       - "traefik.http.services.auth-service.loadbalancer.server.port=4000"
   user-service:
     restart: "unless-stopped"
-    build: ./services/user-service
+    image: ${DOCKER_USERNAME}/user-service:latest
     environment:
       - DB_HOST=postgres
       - DB_PORT=5432
@@ -82,14 +82,14 @@ services:
       auth-service:
         condition: service_started
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4001/health || exit 1"]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://user-service:4001/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.user-service.rule=Host(`user-service.localhost`)"
+      - "traefik.http.routers.user-service.rule=Host(`user-service.${{ secrets.EC2_HOST }}.traefik.me`)"
       - "traefik.http.services.user-service.loadbalancer.server.port=4001"
 volumes:
   postgres_data:
